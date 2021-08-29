@@ -47,10 +47,10 @@ app.get("/urls/new", (req, res) => {
 // POST NEW form on urls path
 app.post("/urls", (req, res) => {
   const shortURL = req.params.shortURL;
-  const userSubmittedLongURL = req.body.longURL; // Log the POST request body to the console
+  const userSubmittedLongURL = req.body.longURL;
   const generatedShortURL = generateRandomString();
   urlDatabase[generatedShortURL] = userSubmittedLongURL;
-  res.redirect(`/urls/${generatedShortURL}`); // Respond with 'Ok' (we will replace this)
+  res.redirect(`/urls/${generatedShortURL}`);
 });
 
 // shortURL site
@@ -61,7 +61,7 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-// get request to DELTE
+// get request to DELETE
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL];
@@ -81,6 +81,13 @@ app.post("/urls/:shortURL", (req, res) => {
   const userSubmittedLongURL = req.body.longURL;
   urlDatabase[shortURL] = userSubmittedLongURL;
   console.log(urlDatabase[shortURL]);
+  res.redirect("/urls");
+});
+
+// added logout function
+app.post("/logout", (req, res) => {
+  console.log("logging out");
+  res.clearCookie("username");
   res.redirect("/urls");
 });
 
