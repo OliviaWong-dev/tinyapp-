@@ -2,9 +2,11 @@ const express = require("express");
 const app = express();
 const PORT = 8080; //default port 8080
 const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.set("view engine", "ejs");
+app.use(cookieParser());
 
 const urlDatabase = {
   b2xVn2: "http://www.lighthouselabs.ca",
@@ -32,34 +34,34 @@ app.get("/hello", (req, res) => {
 
 // urls path to render urls_index
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
   res.render("urls_index", templateVars);
 });
 
 // render NEW URL form
 app.get("/urls/new", (req, res) => {
-  console.log("hi");
-  res.render("urls_new");
+  const templateVars = { username: req.cookies["username"] };
+  res.render("urls_new", templateVars);
 });
 
 // POST NEW form on urls path
 app.post("/urls", (req, res) => {
   const shortURL = req.params.shortURL;
-  const userSubmittedLongURL = req.body.longURL; // Log the POST request body to the console
+  const userSubmittedLongURL = req.body.longURL;
   const generatedShortURL = generateRandomString();
   urlDatabase[generatedShortURL] = userSubmittedLongURL;
-  res.redirect(`/urls/${generatedShortURL}`); // Respond with 'Ok' (we will replace this)
+  res.redirect(`/urls/${generatedShortURL}`);
 });
 
 // shortURL site
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL];
-  const templateVars = { shortURL, longURL };
+  const templateVars = { shortURL, longURL, username: req.cookies["username"] };
   res.render("urls_show", templateVars);
 });
 
-// get request to DELTE
+// get request to DELETE
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL];
@@ -79,6 +81,23 @@ app.post("/urls/:shortURL", (req, res) => {
   const userSubmittedLongURL = req.body.longURL;
   urlDatabase[shortURL] = userSubmittedLongURL;
   console.log(urlDatabase[shortURL]);
+  res.redirect("/urls");
+});
+
+// added logout function
+app.post("/logout", (req, res) => {
+  console.log("logging out");
+  res.clearCookie("username");
+  res.redirect("/urls");
+});
+
+// track username with cookies
+app.post("/login", (req, res) => {
+  const username = req.body.username;
+  res.cookie("username", username);
+  const templateVars = {
+    username: req.cookies["username"],
+  };
   res.redirect("/urls");
 });
 
