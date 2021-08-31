@@ -114,16 +114,31 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls");
 });
 
-// track username with cookies
+// track with cookies
 app.post("/login", (req, res) => {
-  const username = req.body.username;
-  res.cookie("username", username);
-  res.redirect("/urls");
+  if (!emailTaken(req.body.email)) {
+    res.send(403);
+  } else {
+    for (user in users) {
+      const currentEmail = users[user].email;
+      if (users[user].email === req.body.email) {
+        if (users[user].password !== req.body.password) {
+          res.send(403);
+        } else {
+          res.cookie("user", user);
+          res.redirect("/urls");
+        }
+      }
+    }
+  }
 });
 
 // GET registration
 app.get("/register", (req, res) => {
-  res.render("urls_register");
+  const templateVars = {
+    user: users[req.cookies["user"]],
+  };
+  res.render("urls_register", templateVars);
 });
 
 // POST registration
@@ -146,7 +161,10 @@ app.post("/register", (req, res) => {
 
 // GET login paths
 app.get("/login", (req, res) => {
-  res.render("urls_login");
+  const templateVars = {
+    user: users[req.cookies["user"]],
+  };
+  res.render("urls_login", templateVars);
 });
 
 app.listen(PORT, () => {
