@@ -30,6 +30,15 @@ function generateRandomString() {
   return Math.random().toString(36).substring(2, 8);
 }
 
+function emailTaken(userSubmittedEmail) {
+  for (user in users) {
+    if (users[user].email === userSubmittedEmail) {
+      return true;
+    }
+  }
+  return false;
+}
+
 // root path send "Hello"
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -77,7 +86,7 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-// get request to DELETE
+//
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL];
@@ -101,7 +110,7 @@ app.post("/urls/:shortURL", (req, res) => {
 
 // added logout function
 app.post("/logout", (req, res) => {
-  res.clearCookie("username");
+  res.clearCookie("user");
   res.redirect("/urls");
 });
 
@@ -119,18 +128,20 @@ app.get("/register", (req, res) => {
 
 // POST registration
 app.post("/register", (req, res) => {
-  if (req.body.email === "" || req.body.password === "") {
-    res.send(400);
-  }
   const user = {
     id: generateRandomString(),
     email: req.body.email,
     password: req.body.password,
   };
-  users[user.id] = user;
-  res.cookie("user", user.id);
-  console.log(users);
-  res.redirect("/urls");
+  if (req.body.email === "" || req.body.password === "") {
+    res.send(400);
+  } else if (emailTaken(req.body.email)) {
+    res.send(400);
+  } else {
+    users[user.id] = user;
+    res.cookie("user", user.id);
+    res.redirect("/urls");
+  }
 });
 
 app.listen(PORT, () => {
