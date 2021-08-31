@@ -144,6 +144,11 @@ app.post("/register", (req, res) => {
   }
 });
 
+// GET login paths
+app.get("/login", (req, res) => {
+  res.render("urls_login");
+});
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
