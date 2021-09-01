@@ -14,8 +14,8 @@ const urlDatabase = {
 };
 
 const users = {
-  userRandomID: {
-    id: "userRandomID",
+  aJ48lW: {
+    id: "aJ48lW",
     email: "user@example.com",
     password: "purple-monkey-dinosaur",
   },
@@ -39,6 +39,16 @@ function emailTaken(userSubmittedEmail) {
   return false;
 }
 
+function urlsForUser(id) {
+  let userURL = {};
+  for (url in urlDatabase) {
+    if (urlDatabase[url].userID === id) {
+      userURL[url] = urlDatabase[url];
+    }
+  }
+  return userURL;
+}
+
 // root path send "Hello"
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -56,8 +66,11 @@ app.get("/hello", (req, res) => {
 
 // urls path to render urls_index
 app.get("/urls", (req, res) => {
+  const userID = req.cookies["user"];
+  const urls = urlsForUser(userID);
+
   const templateVars = {
-    urls: urlDatabase,
+    urls,
     user: users[req.cookies["user"]],
   };
   res.render("urls_index", templateVars);
