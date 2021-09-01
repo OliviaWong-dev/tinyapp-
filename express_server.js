@@ -108,16 +108,22 @@ app.get("/u/:shortURL", (req, res) => {
 
 // added DELETE function
 app.post("/urls/:shortURL/delete", (req, res) => {
-  const shortURL = req.params.shortURL;
-  delete urlDatabase[shortURL];
+  if (req.cookies["user"]) {
+    console.log(req.cookies["user"]);
+    const shortURL = req.params.shortURL;
+    delete urlDatabase[shortURL];
+  }
   res.redirect("/urls");
 });
 
 // added EDIT function
 app.post("/urls/:shortURL", (req, res) => {
-  const shortURL = req.params.shortURL;
-  const userSubmittedLongURL = req.body.longURL;
-  urlDatabase[shortURL] = userSubmittedLongURL;
+  if (req.cookies["user"]) {
+    console.log(req.cookies["user"]);
+    const shortURL = req.params.shortURL;
+    const userSubmittedLongURL = req.body.longURL;
+    urlDatabase[shortURL] = userSubmittedLongURL;
+  }
   res.redirect("/urls");
 });
 
