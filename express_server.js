@@ -5,6 +5,8 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 app.use(bodyParser.urlencoded({ extended: true }));
 
+const bcrypt = require("bcrypt");
+
 app.set("view engine", "ejs");
 app.use(cookieParser());
 
@@ -135,13 +137,14 @@ app.post("/logout", (req, res) => {
 
 // track with cookies
 app.post("/login", (req, res) => {
+  const password = req.body.password;
   if (!emailTaken(req.body.email)) {
     res.send(403);
   } else {
     for (user in users) {
-      const currentEmail = users[user].email;
       if (users[user].email === req.body.email) {
-        if (users[user].password !== req.body.password) {
+        console.log(users);
+        if (!bcrypt.compareSync(password, users[user].password)) {
           res.send(403);
         } else {
           res.cookie("user", user);
@@ -165,8 +168,9 @@ app.post("/register", (req, res) => {
   const user = {
     id: generateRandomString(),
     email: req.body.email,
-    password: req.body.password,
+    password: bcrypt.hashSync(req.body.password, 10),
   };
+  console.log(user.password);
   if (req.body.email === "" || req.body.password === "") {
     res.send(400);
   } else if (emailTaken(req.body.email)) {
