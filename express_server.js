@@ -4,6 +4,12 @@ const PORT = 8080; //default port 8080
 const bodyParser = require("body-parser");
 const cookieSession = require("cookie-session");
 app.use(bodyParser.urlencoded({ extended: true }));
+const {
+  generateRandomString,
+  emailTaken,
+  urlsForUser,
+} = require("./helpers.js");
+const { urlDatabase } = require("./constants");
 
 const bcrypt = require("bcrypt");
 
@@ -14,11 +20,6 @@ app.use(
     keys: ["key1", "key2"],
   })
 );
-
-const urlDatabase = {
-  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
-  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" },
-};
 
 const users = {
   aJ48lW: {
@@ -32,29 +33,6 @@ const users = {
     password: bcrypt.hashSync("123", 10),
   },
 };
-
-function generateRandomString() {
-  return Math.random().toString(36).substring(2, 8);
-}
-
-function emailTaken(userSubmittedEmail) {
-  for (user in users) {
-    if (users[user].email === userSubmittedEmail) {
-      return users[user];
-    }
-  }
-  return false;
-}
-
-function urlsForUser(id) {
-  let userURL = {};
-  for (url in urlDatabase) {
-    if (urlDatabase[url].userID === id) {
-      userURL[url] = urlDatabase[url];
-    }
-  }
-  return userURL;
-}
 
 // root path send "Hello"
 app.get("/", (req, res) => {
@@ -104,6 +82,7 @@ app.post("/urls", (req, res) => {
 // shortURL site
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
+  console.log(shortURL, urlDatabase);
   const longURL = urlDatabase[shortURL].longURL;
   const templateVars = { shortURL, longURL, user: users[req.session.user_id] };
   res.render("urls_show", templateVars);
