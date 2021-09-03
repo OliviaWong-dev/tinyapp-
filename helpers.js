@@ -1,24 +1,11 @@
 const { urlDatabase } = require("./constants");
 const bcrypt = require("bcrypt");
 
-const users = {
-  aJ48lW: {
-    id: "aJ48lW",
-    email: "a@a.com",
-    password: bcrypt.hashSync("111", 10),
-  },
-  user2RandomID: {
-    id: "user2RandomID",
-    email: "b@b.com",
-    password: bcrypt.hashSync("123", 10),
-  },
-};
-
 const generateRandomString = function () {
   return Math.random().toString(36).substring(2, 8);
 };
 
-const emailTaken = function (userSubmittedEmail, database) {
+const getUserByEmail = function (userSubmittedEmail, users) {
   for (user in users) {
     if (users[user].email === userSubmittedEmail) {
       return users[user];
@@ -37,4 +24,4 @@ const urlsForUser = function (id, database) {
   return userURL;
 };
 
-module.exports = { generateRandomString, emailTaken, urlsForUser };
+module.exports = { generateRandomString, getUserByEmail, urlsForUser };

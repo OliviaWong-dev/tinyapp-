@@ -8,6 +8,7 @@ const {
   generateRandomString,
   emailTaken,
   urlsForUser,
+  getUserByEmail,
 } = require("./helpers.js");
 const { urlDatabase } = require("./constants");
 
@@ -22,15 +23,15 @@ app.use(
 );
 
 const users = {
-  aJ48lW: {
-    id: "aJ48lW",
-    email: "a@a.com",
-    password: bcrypt.hashSync("111", 10),
+  userRandomID: {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: bcrypt.hashSync("purple-monkey-dinosaur", 10),
   },
   user2RandomID: {
     id: "user2RandomID",
-    email: "b@b.com",
-    password: bcrypt.hashSync("123", 10),
+    email: "user2@example.com",
+    password: bcrypt.hashSync("dishwasher-funk", 10),
   },
 };
 
@@ -128,7 +129,7 @@ app.post("/login", (req, res) => {
     return res.status(403).send("Email or password cannot be empty");
   }
 
-  const user = emailTaken(email);
+  const user = getUserByEmail(email, users);
   if (!user) {
     return res.status(403).send("Invalid Email");
   }
@@ -158,7 +159,7 @@ app.post("/register", (req, res) => {
   };
   if (req.body.email === "" || req.body.password === "") {
     res.send(400);
-  } else if (emailTaken(req.body.email)) {
+  } else if (getUserByEmail(req.body.email)) {
     res.send(400);
   } else {
     users[user.id] = user;
@@ -178,3 +179,5 @@ app.get("/login", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
+module.exports = { users };
