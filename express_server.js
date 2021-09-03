@@ -6,7 +6,6 @@ const cookieSession = require("cookie-session");
 app.use(bodyParser.urlencoded({ extended: true }));
 const {
   generateRandomString,
-  emailTaken,
   urlsForUser,
   getUserByEmail,
 } = require("./helpers.js");
