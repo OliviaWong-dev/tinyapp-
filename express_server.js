@@ -151,20 +151,20 @@ app.get("/register", (req, res) => {
 
 // POST registration
 app.post("/register", (req, res) => {
-  const user = {
-    id: generateRandomString(),
-    email: req.body.email,
-    password: bcrypt.hashSync(req.body.password, 10),
-  };
   if (req.body.email === "" || req.body.password === "") {
-    res.send(400);
-  } else if (getUserByEmail(req.body.email)) {
-    res.send(400);
-  } else {
+    return res.send(400);
+  }
+  if (getUserByEmail(req.body.email)) {
+    return res.send(400);
+  } 
+    const user = {
+      id: generateRandomString(),
+      email: req.body.email,
+      password: bcrypt.hashSync(req.body.password, 10),
+    };
     users[user.id] = user;
     req.session.user_id = user.id;
-    res.redirect("/urls");
-  }
+    return res.redirect("/urls");
 });
 
 // GET login paths
